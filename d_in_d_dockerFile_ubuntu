@@ -1,0 +1,32 @@
+FROM maprdocker.lab/mapr:ubuntu12-java7-ecosystem-150515_spy
+MAINTAINER lars
+
+# Let's start with some basic stuff.
+RUN apt-get update
+RUN apt-get --fix-missing -y install \
+    ca-certificates \
+    lxc \
+    iptables
+    
+# Install Docker from Docker Inc. repositories.
+RUN curl -sSL https://get.docker.com/ | sh
+
+# Install the magic wrapper.
+COPY ./dockerwrapper.sh /usr/local/bin/wrapdocker
+RUN chmod +x /usr/local/bin/wrapdocker
+
+# Install the loop fixer 
+COPY ./fix_loop.sh /usr/local/bin/fix_loop.sh
+RUN chmod +x /usr/local/bin/fix_loop.sh
+
+
+# Needed kernel modules so the bridge module could be loaded
+# modules from Ubuntu 12.04.5 on 10.10.1.161,  Ubuntu 14.04.3 from 10.10.100.93 and Ubuntu 14.04.3 from 10.10.1.164
+COPY ./ubuntu/lib/modules/3.2.0-83-generic /lib/modules/3.2.0-83-generic/
+COPY ./ubuntu/lib/modules/3.13.0-63-generic /lib/modules/3.13.0-63-generic/
+COPY ./ubuntu/lib/modules/3.13.0-74-generic /lib/modules/3.13.0-74-generic/
+
+
+# Define additional metadata for our image.
+VOLUME /var/lib/docker
+CMD ["wrapdocker"]

@@ -1,0 +1,1 @@
+cmd_arch/x86/syscalls/../include/generated/asm/syscalls_64.h := /bin/bash '/build/linux-_xRakU/linux-3.13.0/arch/x86/syscalls/syscalltbl.sh' /build/linux-_xRakU/linux-3.13.0/arch/x86/syscalls/syscall_64.tbl arch/x86/syscalls/../include/generated/asm/syscalls_64.h

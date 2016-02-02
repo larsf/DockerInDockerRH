@@ -10,8 +10,16 @@ dmsetup mknodes
 : ${DOCKER_DAEMON_ARGS:=--insecure-registry=maprdocker.lab}
 
 # First, make sure that cgroups are mounted correctly.
-CGROUP=/sys/fs/cgroup
-: {LOG:=stdio}
+# Make sure we account for older kernels by looking at /cgroup
+
+KR=`uname -r`
+KR=${KR%%-*}
+
+if [[ "${KR}" > "2.6.36" ]] ; then
+   CGROUP=/sys/fs/cgroup
+else
+   CGROUP=/cgroup
+fi
 
 [ -d $CGROUP ] || 
 	mkdir $CGROUP

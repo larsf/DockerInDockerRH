@@ -1,0 +1,34 @@
+FROM maprdocker.lab/mapr:centos61-java7-ecosystem-150515_spy
+MAINTAINER lars
+
+# Let's start with some basic stuff.
+RUN yum -y install \
+    ca-certificates \
+    lxc \
+    iptables
+    
+# Install Docker from Docker Inc. repositories.
+RUN curl -sSL https://get.docker.com/ | sh
+
+# Install the magic wrapper.
+COPY ./dockerwrapper.sh /usr/local/bin/wrapdocker
+RUN chmod +x /usr/local/bin/wrapdocker
+
+# Install the loop fixer 
+COPY ./fix_loop.sh /usr/local/bin/fix_loop.sh
+RUN chmod +x /usr/local/bin/fix_loop.sh
+
+# Install missing mkfs stuff (copied from RH6.6 on 10.10.1.162)
+# needed mkfs.ext4, tune2fs and required libraries
+COPY ./sbin/* /sbin/
+COPY ./lib64/* /lib64/
+
+# Needed kernel modules so the bridge module could be loaded
+# modules from R6.6 on 10.10.1.162 and RH7.1 from 10.10.100.91
+COPY ./lib/modules/2.6.32-504.el6.x86_64 /lib/modules/2.6.32-504.el6.x86_64/
+COPY ./lib/modules/3.10.0-229.el7.x86_64 /lib/modules/3.10.0-229.el7.x86_64/
+COPY ./lib/modules/3.10.0-327.4.5.el7.x86_64 /lib/modules/3.10.0-327.4.5.el7.x86_64/
+
+# Define additional metadata for our image.
+VOLUME /var/lib/docker
+CMD ["wrapdocker"]
